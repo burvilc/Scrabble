@@ -1,0 +1,36 @@
+Everything should fit into 1024x768 pixels.
+
+1. Add flask front end
+1.1. set up test server
+1.2. Go through tutorials 
+https://blog.miguelgrinberg.com/post/designing-a-restful-api-using-flask-restful
+
+update pillow test to use cfg
+
+1.3.1. Add to text display of board with graphic; save text to file
+1.3.1.1. Initial board is white board, with dimensions length 800 pixels x width 582 px (units being that of a tile).
+1.3.1.2. For each position on board, 
+		tile size (53.3 px x 38.8 px) 
+		For a given col & row #, calculate top left corner (x,y) where word would start
+		overlay the image on top, e.g. with word, DLS, etc.
+1.3.1.3. pillow python module to image display board, pieces.  https://auth0.com/blog/image-processing-in-python-with-pillow/#Pasting-an-Image-onto-Another-Image
+
+1.3.2. Replace print statements with flask display split into function
+	   input should be text box
+update code to write to file, 
+have flask display that and input
+		https://opentechschool.github.io/python-flask/core/form-submission.html
+		https://opentechschool.github.io/python-flask/core/forms.html
+		https://opentechschool.github.io/python-flask/core/form-submission.html
+
+1.3.3 At the end of each turn, Update image of board, refresh screen
+1.3.3.1. pillow python module to image display board, pieces.  https://auth0.com/blog/image-processing-in-python-with-pillow/#Pasting-an-Image-onto-Another-Image
+1.3.3.2. Update: whose turn it is (display that), reset timer
+1.3.3.3. Push html refresh - https://stackoverflow.com/questions/46822068/how-to-reload-flask-based-webpage-after-form-submission
+ 
+Drag and drop?  Or just click piece then dest square, or leave cells as specified now, in text, and submit form
+2. Adapt for Chinese characters
+2.1. import dictionary of characters
+2.2. Read chinese characters
+2.3. Display chinese characters
+2.4. phrase dictionary
