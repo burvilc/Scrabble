@@ -30,6 +30,9 @@ have flask display that and input
  
 Drag and drop?  Or just click piece then dest square, or leave cells as specified now, in text, and submit form
 2. Adapt for Chinese characters
+2.1. Research codify sentence structures
+2.1. codify sentence structures
+.... classify each word - verb, noun, etc.
 2.1. import dictionary of characters
 2.2. Read chinese characters
 2.3. Display chinese characters

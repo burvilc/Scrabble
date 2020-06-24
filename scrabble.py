@@ -1,3 +1,5 @@
+#!/usr/bin/env python3 
+
 from random import shuffle
 
 """
@@ -454,23 +456,52 @@ def turn(player, board, bag):
     else:
         end_game()
 
+# IN: text to display,
+#     if input is required
+# OUT: response (string)
+def show_response(text, input_needed):
+    retval = None 
+    if (input_needed is False):
+        #print("no input needed")
+        print(text)
+    else:
+        while retval is None:
+            retval = str(input(text)) 
+    return retval
+
 def start_game():
     #Begins the game and calls the turn function.
     global round_number, players, skipped_turns
     board = Board()
     bag = Bag()
 
-    #Asks the player for the number of players.
-    num_of_players = int(input("\nPlease enter the number of players (2-4): "))
-    while num_of_players < 2 or num_of_players > 4:
-        num_of_players = int(input("This number is invalid. Please enter the number of players (2-4): "))
-
     #Welcomes players to the game and allows players to choose their name.
-    print("\nWelcome to Scrabble! Please enter the names of the players below.")
+    num_of_players=4  #Initially assume max number of players
+    num_of_players_min=2
+    show_response("\nWelcome to Scrabble! A minimum of 2 and a maximum of 4 players are needed.", False)
     players = []
-    for i in range(num_of_players):
-        players.append(Player(bag))
-        players[i].set_name(input("Please enter player " + str(i+1) + "'s name: "))
+    i = 0
+    while i < num_of_players:
+        name_taken = False
+        player_name = show_response( "Please enter player " + str(i+1) + "'s name. Enter a blank name if there are no more players (need at least 2 players, maximum 4 players). ", True)
+        #print ("Got " + str(player_name))
+        if player_name is not None and len(player_name) != 0:    
+            if i > 0:
+                for j in range(i): # Check if requested name already used
+                    #print(" j " + str(j) + ", name " + str(players[j].get_name() ) )
+                    if ( player_name == players[j].get_name() ):
+                         show_response("Name " + str(player_name) + " already taken.  Please choose another name.", False)
+                         name_taken = True
+            if name_taken is True:  # If taken, repeat while loop, i.e. is i not incremented
+                continue
+            players.append(Player(bag))  # If all conditions OK, set up user with bag
+            players[i].set_name(player_name)
+            i = i+1
+        else:  
+            if i < num_of_players_min:
+                show_response("Not enough players.", False)
+            else:
+                break  #stop collecting info if player name is blank, i.e. no more players.
 
     #Sets the default value of global variables.
     round_number = 1
