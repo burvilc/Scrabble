@@ -291,7 +291,7 @@ class Word:
             #Allows for players to declare the value of a blank tile.
             if "#" in self.word:
                 while len(blank_tile_val) != 1:
-                    blank_tile_val = input("Please enter the letter value of the blank tile: ")
+                    blank_tile_val = get_response("Please enter the letter value of the blank tile: ")
                 self.word = self.word[:word.index("#")] + blank_tile_val.upper() + self.word[(word.index("#")+1):]
 
             #Reads in the board's current values under where the word that is being played will go. Raises an error if the direction is not valid.
@@ -319,7 +319,7 @@ class Word:
                 if current_board_ltr[i] == " ":
                     needed_tiles += self.word[i]
                 elif current_board_ltr[i] != self.word[i]:
-                    print("Current_board_ltr: " + str(current_board_ltr) + ", Word: " + self.word + ", Needed_Tiles: " + needed_tiles)
+                    display("Current_board_ltr: " + str(current_board_ltr) + ", Word: " + self.word + ", Needed_Tiles: " + needed_tiles)
                     return "The letters do not overlap correctly, please choose another word."
 
             #If there is a blank tile, remove it's given value from the tiles needed to play the word.
@@ -328,7 +328,7 @@ class Word:
 
             #Ensures that the word will be connected to other words on the playing board.
             if (round_number != 1 or (round_number == 1 and players[0] != self.player)) and current_board_ltr == " " * len(self.word):
-                print("Current_board_ltr: " + str(current_board_ltr) + ", Word: " + self.word + ", Needed_Tiles: " + needed_tiles)
+                display("Current_board_ltr: " + str(current_board_ltr) + ", Word: " + self.word + ", Needed_Tiles: " + needed_tiles)
                 return "Please connect the word to a previously played letter."
 
             #Raises an error if the player does not have the correct tiles to play the word.
@@ -347,7 +347,7 @@ class Word:
 
         #If the user IS skipping the turn, confirm. If the user replies with "Y", skip the player's turn. Otherwise, allow the user to enter another word.
         else:
-            if input("Are you sure you would like to skip your turn? (y/n)").upper() == "Y":
+            if get_response("Are you sure you would like to skip your turn? (y/n)").upper() == "Y":
                 if round_number == 1 and players[0] == self.player:
                     return "Please do not skip the first turn. Please enter a word."
                 return True
@@ -394,45 +394,45 @@ def turn(player, board, bag):
     if (skipped_turns < 6) or (player.rack.get_rack_length() == 0 and bag.get_remaining_tiles() == 0):
 
         #Displays whose turn it is, the current board, and the player's rack.
-        print("\nRound " + str(round_number) + ": " + player.get_name() + "'s turn \n")
-        print(board.get_board())
-        print("\n" + player.get_name() + "'s Letter Rack: " + player.get_rack_str())
-
+        status = "\nRound " + str(round_number) + ": " + player.get_name() + "'s turn \n"
+        status += board.get_board()
+        status += "\n" + player.get_name() + "'s Letter Rack: " + player.get_rack_str()
+        display(status)
         #Gets information in order to play a word.
-        word_to_play = input("Word to play: ")
+        # !! ?? bunch up for gui
+        word_to_play, col, row, direction = get_response("Word to play: ", \
+                "Column number: ", \
+                "Row number: ", "Direction of word (right or down): " )
         location = []
-        col = input("Column number: ")
-        row = input("Row number: ")
         if (col == "" or row == "") or (col not in [str(x) for x in range(15)] or row not in [str(x) for x in range(15)]):
             location = [-1, -1]
         else:
             location = [int(row), int(col)]
-        direction = input("Direction of word (right or down): ")
 
         word = Word(word_to_play, location, player, direction, board.board_array())
 
         #If the first word throws an error, creates a recursive loop until the information is given correctly.
-        checked = word.check_word()
-        while checked != True:
-            print(checked)
-            word_to_play = input("Word to play: ")
+        checked_result = word.check_word()
+        while checked_result != True:
+            display(checked_result)
+            #!! ??conditional here, based on ui value, i.e. bunch up req/resp if GUI
+            word_to_play, col, row, direction = get_response("Word to play: ", \
+                "Column number: ", \
+                "Row number: ", "Direction of word (right or down): " )
             word.set_word(word_to_play)
             location = []
-            col = input("Column number: ")
-            row = input("Row number: ")
             if (col == "" or row == "") or (col not in [str(x) for x in range(15)] or row not in [str(x) for x in range(15)]):
                 location = [-1, -1]
             else:
                 word.set_location([int(row), int(col)])
                 location = [int(row), int(col)]
-            direction = input("Direction of word (right or down): ")
             word.set_direction(direction)
             checked = word.check_word()
 
         #If the user has confirmed that they would like to skip their turn, skip it.
         #Otherwise, plays the correct word and prints the board.
         if word.get_word() == "":
-            print("Your turn has been skipped.")
+            display("Your turn has been skipped.")
             skipped_turns += 1
         else:
             board.place_word(word_to_play, location, direction, player)
@@ -440,7 +440,7 @@ def turn(player, board, bag):
             skipped_turns = 0
 
         #Prints the current player's score
-        print("\n" + player.get_name() + "'s score is: " + str(player.get_score()))
+        display("\n" + player.get_name() + "'s score is: " + str(player.get_score()))
 
         #Gets the next player.
         if players.index(player) != (len(players)-1):
@@ -455,42 +455,65 @@ def turn(player, board, bag):
     #If the number of skipped turns is over 6 or the bag has both run out of tiles and a player is out of tiles, end the game.
     else:
         end_game()
+# IN: text to display - can be string or tuple
+#     if input is needed - can be string or tuple; if tuple, index matches with text typle
+# OUT: values that user inputted; string if single value, list if not
+#
+# If type of data is string
+#   show_response
+# Elif type of data is list or tuple
+#   iterate through each entry
+#   
+def get_response(*text_strings):
+    ret_vals = []
+    for text in text_strings:
+        if type(text) is str: 
+            if ( ui == "tui" ):
+                retval = None
+                while retval is None:
+                    retval = str(input(text)) 
+            elif ( ui == "gui" ):
+                pass
+            ret_vals.append(retval)
+        else:
+            print("ERROR: display value " + str(text) + " is not text")
+    if len(ret_vals) == 1:
+        return ret_vals[0]
+    else:
+        return ret_vals
 
 # IN: text to display,
 #     if input is required
 # OUT: response (string)
-def show_response(text, input_needed):
-    retval = None 
-    if (input_needed is False):
-        #print("no input needed")
+def display(text):
+    if ( ui == "tui" ):
         print(text)
-    else:
-        while retval is None:
-            retval = str(input(text)) 
-    return retval
+    elif ( ui == "gui" ):
+        pass
 
 def start_game():
     #Begins the game and calls the turn function.
-    global round_number, players, skipped_turns
+    global round_number, players, skipped_turns, ui
+    ui = "tui"
     board = Board()
     bag = Bag()
 
     #Welcomes players to the game and allows players to choose their name.
     num_of_players=4  #Initially assume max number of players
     num_of_players_min=2
-    show_response("\nWelcome to Scrabble! A minimum of 2 and a maximum of 4 players are needed.", False)
+    display("\nWelcome to Scrabble! A minimum of 2 and a maximum of 4 players are needed.")
     players = []
     i = 0
     while i < num_of_players:
         name_taken = False
-        player_name = show_response( "Please enter player " + str(i+1) + "'s name. Enter a blank name if there are no more players (need at least 2 players, maximum 4 players). ", True)
+        player_name = get_response( "Please enter player " + str(i+1) + "'s name. Enter a blank name if there are no more players (need at least 2 players, maximum 4 players). ", True)
         #print ("Got " + str(player_name))
         if player_name is not None and len(player_name) != 0:    
             if i > 0:
                 for j in range(i): # Check if requested name already used
                     #print(" j " + str(j) + ", name " + str(players[j].get_name() ) )
                     if ( player_name == players[j].get_name() ):
-                         show_response("Name " + str(player_name) + " already taken.  Please choose another name.", False)
+                         display("Name " + str(player_name) + " already taken.  Please choose another name.")
                          name_taken = True
             if name_taken is True:  # If taken, repeat while loop, i.e. is i not incremented
                 continue
@@ -499,7 +522,7 @@ def start_game():
             i = i+1
         else:  
             if i < num_of_players_min:
-                show_response("Not enough players.", False)
+                display("Not enough players.")
             else:
                 break  #stop collecting info if player name is blank, i.e. no more players.
 
@@ -518,9 +541,10 @@ def end_game():
         if player.get_score > highest_score:
             highest_score = player.get_score()
             winning_player = player.get_name()
-    print("The game is over! " + winning_player + ", you have won!")
+    display("The game is over! " + winning_player + ", you have won!")
 
-    if input("\nWould you like to play again? (y/n)").upper() == "Y":
+    response = get_response("\nWould you like to play again? (y/n)")
+    if response.upper() == "Y":
         start_game()
 
 start_game()
