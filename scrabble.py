@@ -506,7 +506,7 @@ def start_game():
     i = 0
     while i < num_of_players:
         name_taken = False
-        player_name = get_response( "Please enter player " + str(i+1) + "'s name. Enter a blank name if there are no more players (need at least 2 players, maximum 4 players). ", True)
+        player_name = get_response( "Please enter player " + str(i+1) + "'s name. Enter a blank name if there are no more players (need at least 2 players, maximum 4 players). ")
         #print ("Got " + str(player_name))
         if player_name is not None and len(player_name) != 0:    
             if i > 0:
