@@ -489,11 +489,11 @@ def display(text):
     if ( ui == "tui" ):
         print(text)
     elif ( ui == "gui" ):
-        pass
+        txt_no_resp += text
 
 def start_game(mode):
     #Begins the game and calls the turn function.
-    global round_number, players, skipped_turns, ui
+    global round_number, players, skipped_turns, ui, txt_no_resp # text_no_resp if no respnse from user needed
     ui = mode 
     board = Board()
     bag = Bag()
