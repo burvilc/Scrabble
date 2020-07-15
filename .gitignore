@@ -15,4 +15,5 @@ tmp*
 *.yaml
 *.pyc
 flask-examples*
+sandbox/*
 __pycache__

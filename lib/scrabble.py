@@ -61,6 +61,12 @@ class Tile:
         #Returns the tile's score value.
         return self.score
 
+def test_Tile():
+    t = Tile("A", LETTER_VALUES)
+    assert type(t).__name__ == 'Tile'
+    assert t.get_letter() == 'A'
+    #assert type(t) == lib.scrabble.Tile 
+
 class Bag:
     """
     Creates the bag of all tiles that will be available during the game. Contains 98 letters and two blank tiles.
